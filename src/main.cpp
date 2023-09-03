@@ -2,9 +2,17 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int* read_triangle_array(FILE *stream);
+struct TriangleArray
+{
+    size_t triangle_side;
+    int *data;
+};
 
-void print_triangle_array(size_t triangle_side, const int *data);
+const size_t MAX_FILE_NAME_LEN = 100;
+
+TriangleArray read_triangle_array(FILE *stream);
+
+void print_triangle_array(TriangleArray arr);
 
 size_t find_maximum_elem_width(size_t array_size, const int *data);
 
@@ -14,7 +22,9 @@ size_t full_triangle_array_length( size_t triangle_side );
 
 int main()
 {
-    const int data[] =
+    /*
+    // вариант с печатью "константы"
+    int data[] =
                     {
                         0,
                         1, -200,
@@ -23,44 +33,77 @@ int main()
                     };
     const size_t triangle_side = 4;
 
-    print_triangle_array(triangle_side, data);
+    TriangleArray tr_arr = {triangle_side, data};
+    */
 
-    //printf("!!! %d\n", find_maximum_elem_width(full_triangle_array_length(4), data));
+    // вариант с чтением из потока
+    //TriangleArray tr_arr = read_triangle_array(stdin);
+
+    // вариант с чтением из файла
+    printf("Enter file's name:\n");
+    char file_name[MAX_FILE_NAME_LEN];
+    if (scanf("%s", file_name) != 1 )
+    {
+        fprintf(stderr, "Something went wrong. Please, restart and try again.\n");
+        return 1;
+    }
+    FILE *file = fopen(file_name, "r");
+    if (file == NULL)
+    {
+        fprintf(stderr, "Can not open file: %s. Please, restart and try again.\n", file_name);
+        return 1;
+    }
+
+    TriangleArray tr_arr = read_triangle_array(file);
+    if (tr_arr.data == NULL)
+    {
+        fprintf(stderr, "Some error occurred during reading the array.\n");
+        return 1;
+    }
+
+    print_triangle_array(tr_arr);
+
+    free(tr_arr.data);
 
     return 0;
 }
 
-int* read_triangle_array(FILE *stream)
+TriangleArray read_triangle_array(FILE *stream)
 {
     assert(stream != NULL);
 
     size_t triangle_side = 0;
-    if (fscanf(stream, "%d", &triangle_side) != 1) return NULL;
+    if (fscanf(stream, "%d", &triangle_side) != 1) return {0, NULL};
 
     size_t array_size = full_triangle_array_length(triangle_side);
 
     int *p_array = (int *) calloc( array_size, sizeof(int) );
 
-    for ( size_t ind = 0; ind < array_size; ind++)
+    for ( size_t ind = 0; ind < array_size; ind++ )
     {
         int buf = 0;
 
-        if (fscanf(stream, "%d", &buf) != 1) return NULL;
+        if (fscanf(stream, "%d", &buf) != 1) return {0, NULL};
+
+        p_array[ ind ] = buf;
     }
 
+    return {triangle_side, p_array};
 }
 
-void print_triangle_array(size_t triangle_side, const int *data)
+void print_triangle_array(TriangleArray arr)
 {
-    assert(data != NULL);
+    assert(arr.data != NULL);
 
-    for (size_t i = 0; i < triangle_side; i++)
+    for (size_t i = 0; i < arr.triangle_side; i++)
     {
         for (size_t j = 0; j < i + 1; j++)
         {
-            //printf("debug: offset on row %d is %d.\n", i, (1+i)*i/2 + j);
-            printf("%*d ",  find_maximum_elem_width( full_triangle_array_length(4), data ),
-                            *(data + (1+i)*i/2 + j) );
+            size_t width = find_maximum_elem_width( full_triangle_array_length(arr.triangle_side),
+                                                    arr.data );
+
+            printf("%*d ", width, *(arr.data + (1+i)*i/2 + j) );
+            //Дед сказал написать без [] для усиления понимания
         }
         printf("\n");
     }
