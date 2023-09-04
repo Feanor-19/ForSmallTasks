@@ -20,6 +20,7 @@ size_t find_num_width(int num);
 
 size_t full_triangle_array_length( size_t triangle_side );
 
+/*
 int main()
 {
     /*
