@@ -41,7 +41,8 @@ int main()
 
     // вариант с чтением из файла
     printf("Enter file's name:\n");
-    char file_name[MAX_FILE_NAME_LEN];
+    char file_name[MAX_FILE_NAME_LEN] = "";
+    printf("!! %d\n", file_name[0]);
     if (scanf("%s", file_name) != 1 )
     {
         fprintf(stderr, "Something went wrong. Please, restart and try again.\n");
@@ -102,8 +103,8 @@ void print_triangle_array(TriangleArray arr)
             size_t width = find_maximum_elem_width( full_triangle_array_length(arr.triangle_side),
                                                     arr.data );
 
-            printf("%*d ", width, *(arr.data + (1+i)*i/2 + j) );
             //Дед сказал написать без [] для усиления понимания
+            printf("%*d ", width, *(arr.data + (1+i)*i/2 + j) );
         }
         printf("\n");
     }
