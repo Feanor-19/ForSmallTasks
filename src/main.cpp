@@ -3,14 +3,26 @@
 #include <assert.h>
 #include <string.h>
 
+size_t get_number_of_lines(void);
+
 void print_text(char *text[], size_t nLines);
+
+void free_arr_elems( void *arr[], size_t arr_size );
+
+void inline clear_inp_buf(FILE *inp_stream)
+{
+    while (getc(inp_stream) != '\n')
+        ;
+}
 
 int main()
 {
-    const size_t nLines = 5;
+    size_t nLines = 5;
     const size_t BUF_SIZE = 100;
 
-    char *text[nLines] = {};
+    nLines = get_number_of_lines();
+
+    char **text = (char **) calloc( nLines, sizeof( char * ) );
 
     char buf[BUF_SIZE] = {};
     for (size_t ind = 0; ind < nLines; ind++)
@@ -27,7 +39,29 @@ int main()
 
     print_text(text, nLines);
 
+    free_arr_elems( (void **) text, nLines);
+
+    free(text);
+
     return 0;
+}
+
+size_t get_number_of_lines(void)
+{
+    size_t nLines = 0;
+
+    printf("Please, enter number of lines in the text.\n");
+
+    while ( scanf("%u", &nLines) != 1 || nLines == 0 )
+    {
+        printf("Please, try again!\n");
+
+        clear_inp_buf(stdin);
+    }
+
+    clear_inp_buf(stdin);
+
+    return nLines;
 }
 
 void print_text(char *text[], size_t nLines)
@@ -46,5 +80,19 @@ void print_text(char *text[], size_t nLines)
             printf("At index %ud lies nullptr!\n", ind);
         }
 
+    }
+}
+
+void free_arr_elems( void *arr[], size_t arr_size )
+{
+    assert(arr != NULL);
+
+    for (size_t ind = 0; ind < arr_size; ind++)
+    {
+        if ( arr[ind] != NULL )
+        {
+            free( arr[ind] );
+            arr[ind] = NULL;
+        }
     }
 }
