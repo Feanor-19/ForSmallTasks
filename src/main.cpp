@@ -15,7 +15,7 @@ size_t get_number_of_lines(void);
     to be stored.
     @param [in] line_size Size (in chars) of one block of memory to allocate.
     Later this block will be changed by my_getline() if needed, but my_getline()
-    requires some memory to start with. Must be > 2.
+    requires some memory to start with. line_size must be > 2.
     @return text[] if no errors occurred, NULL otherwise.
 */
 char ** initialize_text(char *text[], size_t nLines, size_t line_size);
